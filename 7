@@ -1,0 +1,122 @@
+Excellent — let’s extend the previous Kubernetes deployment (the Flask Registration App) to expose via NodePort and scale it to 3 replicas.
+
+Below is the full step-by-step guide.
+
+1. Expose the Flask App with a NodePort Service
+
+If you already used the earlier deployment.yaml, it included a NodePort service.
+If not, here’s the corrected version you can apply directly.
+
+flask-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flask-registration-deployment
+  labels:
+    app: flask-registration
+spec:
+  replicas: 2    # initial replica count
+  selector:
+    matchLabels:
+      app: flask-registration
+  template:
+    metadata:
+      labels:
+        app: flask-registration
+    spec:
+      containers:
+      - name: flask-registration-container
+        image: <your-dockerhub-username>/flask-registration:latest
+        ports:
+        - containerPort: 5000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: flask-registration-service
+spec:
+  selector:
+    app: flask-registration
+  type: NodePort
+  ports:
+    - port: 80
+      targetPort: 5000
+      nodePort: 30007   # choose any port between 30000–32767
+
+
+Replace <your-dockerhub-username> with your Docker Hub username.
+
+2. Deploy the Application
+kubectl apply -f flask-deployment.yaml
+
+
+Verify deployment and service:
+
+kubectl get deployments
+kubectl get pods
+kubectl get svc
+
+
+Expected Output:
+
+NAME                          READY   UP-TO-DATE   AVAILABLE   AGE
+flask-registration-deployment  2/2     2            2           1m
+
+NAME                        TYPE       CLUSTER-IP      EXTERNAL-IP   PORT(S)        AGE
+flask-registration-service   NodePort   10.97.18.10     <none>        80:30007/TCP   1m
+
+3. Access the Application via Node IP and Port
+Find the Node IP:
+kubectl get nodes -o wide
+
+
+Example output:
+
+NAME           STATUS   ROLES           AGE   VERSION   INTERNAL-IP      EXTERNAL-IP
+minikube       Ready    control-plane   12m   v1.29.0   192.168.49.2     <none>
+
+
+Here, the Node IP is 192.168.49.2 (your Minikube IP may differ).
+
+Access the App in Browser
+
+Visit:
+
+http://192.168.49.2:30007
+
+
+or use Minikube shortcut:
+
+minikube service flask-registration-service
+
+
+You should see your Flask User Registration Form (Name, Email, Phone, Department).
+
+4. Scale the Deployment to 3 Replicas
+Command to Scale Up
+kubectl scale deployment flask-registration-deployment --replicas=3
+
+
+Verify scaling:
+
+kubectl get deployments
+kubectl get pods
+
+
+Expected Output:
+
+NAME                          READY   UP-TO-DATE   AVAILABLE   AGE
+flask-registration-deployment  3/3     3            3           2m
+
+
+Now you have three pods running your Flask application, all exposed through the same NodePort service.
+
+5. Summary of Key Commands
+Purpose	Command	Description
+Deploy app	kubectl apply -f flask-deployment.yaml	Creates deployment and NodePort service
+List pods	kubectl get pods	Shows running pods
+List services	kubectl get svc	Shows NodePort service and assigned port
+Get node IP	kubectl get nodes -o wide	Displays internal/external IPs
+Access service	http://<Node-IP>:<NodePort>	Open Flask form in browser
+Scale deployment	kubectl scale deployment flask-registration-deployment --replicas=3	Increases running pods
+Verify scaling	kubectl get deployments	Confirms updated replica coun
