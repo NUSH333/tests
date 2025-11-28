@@ -1,0 +1,108 @@
+Below is the complete Kubernetes deployment guide for your Flask Registration App built from the previous Docker image (flask-registration).
+
+1. Prerequisites
+
+Before proceeding, ensure:
+
+Docker image is already built and (optionally) pushed to Docker Hub.
+
+Kubernetes is installed (e.g., via Minikube or Docker Desktop).
+
+kubectl command-line tool is configured.
+
+2. Push Image to Docker Hub (if using Kubernetes on another machine)
+# Log in to Docker Hub
+docker login
+
+# Tag the image for Docker Hub
+docker tag flask-registration <your-dockerhub-username>/flask-registration:latest
+
+# Push the image
+docker push <your-dockerhub-username>/flask-registration:latest
+
+3. Create Kubernetes Deployment File
+
+Create a file named deployment.yaml in your project folder.
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flask-registration-deployment
+  labels:
+    app: flask-registration
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: flask-registration
+  template:
+    metadata:
+      labels:
+        app: flask-registration
+    spec:
+      containers:
+      - name: flask-registration-container
+        image: <your-dockerhub-username>/flask-registration:latest
+        ports:
+        - containerPort: 5000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: flask-registration-service
+spec:
+  selector:
+    app: flask-registration
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 5000
+  type: NodePort
+
+
+Replace <your-dockerhub-username> with your actual Docker Hub username.
+
+4. Deploy on Kubernetes
+# Apply deployment and service files
+kubectl apply -f deployment.yaml
+
+5. Verify the Pod and Service Status
+# Check if pods are running
+kubectl get pods
+
+# Check deployment status
+kubectl get deployments
+
+# Check services
+kubectl get svc
+
+
+Expected Output Example:
+
+NAME                                 READY   STATUS    RESTARTS   AGE
+flask-registration-deployment-abcde   1/1     Running   0          1m
+flask-registration-deployment-fghij   1/1     Running   0          1m
+
+6. Access the Flask Application
+
+If using Minikube, run:
+
+minikube service flask-registration-service
+
+
+This will open the Flask registration form in your browser (default port usually http://<minikube-ip>:<nodePort>).
+
+If using Docker Desktop Kubernetes, note the NodePort using:
+
+kubectl get svc
+
+
+Then visit:
+
+http://localhost:<nodePort>
+
+7. Clean Up Resources
+
+To delete everything created:
+
+kubectl delete -f deployment.yaml
