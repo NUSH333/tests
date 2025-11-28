@@ -1,0 +1,100 @@
+1. Project Structure
+ml-project/
+│
+├── app.py                        # your Flask app (previous task)
+├── requirements.txt               # Python dependencies
+├── ml_setup.ipynb                 # Jupyter notebook documentation
+└── Dockerfile                     # optional (if already included)
+
+2. Create the requirements.txt File
+
+Inside your project directory, create a file named requirements.txt with these contents:
+
+flask
+numpy
+pandas
+matplotlib
+scikit-learn
+jupyter
+
+
+These are common baseline libraries for ML experimentation and data visualization.
+
+3. Create and Activate a Virtual Environment
+
+In your terminal:
+
+# Create a virtual environment
+python -m venv venv
+
+# Activate it (Windows)
+venv\Scripts\activate
+
+# or (Mac/Linux)
+source venv/bin/activate
+
+4. Install Required Packages
+pip install -r requirements.txt
+
+
+Verify installation:
+
+pip list
+
+5. Verify Environment Setup in Jupyter
+
+Launch a Jupyter notebook:
+
+jupyter notebook
+
+
+Create a new notebook named ml_setup.ipynb and document the following steps inside it.
+
+Jupyter Notebook Content Example
+Cell 1 — Introduction
+# Machine Learning Environment Setup
+
+This notebook documents the setup and verification of a basic ML environment.
+It includes steps for virtual environment creation, dependency installation, and verification.
+
+Cell 2 — Import Libraries
+import flask
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import sklearn
+
+print("Flask version:", flask.__version__)
+print("NumPy version:", np.__version__)
+print("Pandas version:", pd.__version__)
+print("Matplotlib version:", plt.matplotlib.__version__)
+print("scikit-learn version:", sklearn.__version__)
+
+Cell 3 — Test Simple ML Task
+from sklearn.linear_model import LinearRegression
+import numpy as np
+
+# Create dummy data
+X = np.array([[1], [2], [3], [4], [5]])
+y = np.array([2, 4, 6, 8, 10])
+
+# Train model
+model = LinearRegression()
+model.fit(X, y)
+
+print("Coefficient:", model.coef_)
+print("Intercept:", model.intercept_)
+print("Prediction for 6:", model.predict([[6]]))
+
+
+This confirms the ML environment and libraries are functioning correctly.
+
+6. Commit and Push to GitHub
+# Add new files
+git add requirements.txt ml_setup.ipynb
+
+# Commit changes
+git commit -m "Added ML environment setup and Jupyter notebook documentation"
+
+# Push to GitHub
+git push origin main
